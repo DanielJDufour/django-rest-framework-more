@@ -10,7 +10,7 @@ from .filters import create_filterset_class
 from .renderers import NonPaginatedCSVRenderer
 from .serializers import create_model_serializer_class
 
-def create_viewset_class(model, serializer=None, filterset_class=None, queryset=None, debug=False):
+def create_viewset_class(model, serializer=None, filterset_class=None, queryset=None, debug=False, renderer_classes=(BrowsableAPIRenderer, JSONRenderer, PaginatedCSVRenderer, NonPaginatedCSVRenderer, )):
     if not model:
         raise Exception("You must pass in a model")
 
@@ -36,7 +36,7 @@ def create_viewset_class(model, serializer=None, filterset_class=None, queryset=
     if debug: print("viewset_name:", viewset_name)
 
     defs = {
-        "renderer_classes": (BrowsableAPIRenderer, JSONRenderer, PaginatedCSVRenderer, NonPaginatedCSVRenderer, ),
+        "renderer_classes": renderer_classes,
         "queryset": queryset,
         "serializer_class": serializer,
         "filter_backends": [DjangoFilterBackend, SearchFilter, OrderingFilter],

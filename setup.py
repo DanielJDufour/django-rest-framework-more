@@ -11,7 +11,7 @@ setup(
   packages = ['rest_framework_more'],
   package_dir = {'rest_framework_more': 'rest_framework_more'},
   package_data = {'rest_framework_more': ['__init__.py','filters.py','renderers.py','serializers.py','viewsets.py']},
-  version = '0.2.0',
+  version = '0.3.0',
   description = 'More Cool Django Rest Framework Stuff',
   long_description = long_description,
   long_description_content_type='text/markdown',
