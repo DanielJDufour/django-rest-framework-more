@@ -6,11 +6,11 @@ from rest_framework_csv.renderers import PaginatedCSVRenderer
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 
-from .filters import create_filterset_class
+from .filters import create_model_filterset_class
 from .renderers import NonPaginatedCSVRenderer
 from .serializers import create_model_serializer_class
 
-def create_viewset_class(model, serializer=None, filterset_class=None, queryset=None, debug=False, renderer_classes=(BrowsableAPIRenderer, JSONRenderer, PaginatedCSVRenderer, NonPaginatedCSVRenderer, )):
+def create_model_viewset_class(model, serializer=None, filterset_class=None, queryset=None, debug=False, renderer_classes=(BrowsableAPIRenderer, JSONRenderer, PaginatedCSVRenderer, NonPaginatedCSVRenderer, )):
     if not model:
         raise Exception("You must pass in a model")
 
@@ -18,10 +18,10 @@ def create_viewset_class(model, serializer=None, filterset_class=None, queryset=
     if debug: print("model_name:", model_name)
 
     if model and not filterset_class:
-        filterset_class = create_filterset_class(model)
+        filterset_class = create_model_filterset_class(model=model)
 
     if model and not serializer:
-        serializer = create_model_serializer_class(model)
+        serializer = create_model_serializer_class(model=model)
 
     if not queryset:
         queryset = model.objects.all()

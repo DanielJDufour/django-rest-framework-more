@@ -25,7 +25,7 @@ def create_model_filter_form(model, debug=False):
 
     return form
 
-def create_model_filterset_class(form=None, model=None, debug=False):
+def create_model_filterset_class(model=None, form=None, debug=False):
 
     if form is None and model is None:
         raise Exception("you must pass in a form or model")
