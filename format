@@ -1,0 +1,4 @@
+#!/bin/sh -e
+
+pipenv run black rest_framework_more setup.py
+

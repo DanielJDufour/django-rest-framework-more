@@ -10,12 +10,26 @@ from .filters import create_model_filterset_class
 from .renderers import NonPaginatedCSVRenderer
 from .serializers import create_model_serializer_class
 
-def create_model_viewset_class(model, serializer=None, filterset_class=None, queryset=None, debug=False, renderer_classes=(BrowsableAPIRenderer, JSONRenderer, PaginatedCSVRenderer, NonPaginatedCSVRenderer, )):
+
+def create_model_viewset_class(
+    model,
+    serializer=None,
+    filterset_class=None,
+    queryset=None,
+    debug=False,
+    renderer_classes=(
+        BrowsableAPIRenderer,
+        JSONRenderer,
+        PaginatedCSVRenderer,
+        NonPaginatedCSVRenderer,
+    ),
+):
     if not model:
         raise Exception("You must pass in a model")
 
     model_name = model.__name__
-    if debug: print("model_name:", model_name)
+    if debug:
+        print("model_name:", model_name)
 
     if model and not filterset_class:
         filterset_class = create_model_filterset_class(model=model)
@@ -27,13 +41,18 @@ def create_model_viewset_class(model, serializer=None, filterset_class=None, que
         queryset = model.objects.all()
 
     fields = model._meta.get_fields(include_hidden=True)
-    if debug: print("fields:", fields)
+    if debug:
+        print("fields:", fields)
 
-    text_fields = [f.name for f in fields if f.__class__.__name__ in ("CharField", "TextField")]
-    if debug: print("text_fields:", text_fields)
+    text_fields = [
+        f.name for f in fields if f.__class__.__name__ in ("CharField", "TextField")
+    ]
+    if debug:
+        print("text_fields:", text_fields)
 
     viewset_name = model_name + "ViewSet"
-    if debug: print("viewset_name:", viewset_name)
+    if debug:
+        print("viewset_name:", viewset_name)
 
     defs = {
         "renderer_classes": renderer_classes,
@@ -42,10 +61,11 @@ def create_model_viewset_class(model, serializer=None, filterset_class=None, que
         "filter_backends": [DjangoFilterBackend, SearchFilter, OrderingFilter],
         "filterset_class": filterset_class,
         "search_fields": text_fields,
-        "ordering_fields": "__all__"
+        "ordering_fields": "__all__",
     }
 
     viewset = type(viewset_name, (ReadOnlyModelViewSet,), defs)
-    if debug: print("viewset:", viewset)
+    if debug:
+        print("viewset:", viewset)
 
     return viewset
