@@ -19,7 +19,7 @@ setup(
             "viewsets.py",
         ]
     },
-    version="0.4.0",
+    version="0.5.0",
     description="More Cool Django Rest Framework Stuff",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -32,11 +32,12 @@ setup(
         "django",
         "django-rest-framework",
         "drf",
+        "drf-flex-fields",
         "djangorestframework-csv",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    install_requires=["djangorestframework-csv"],
+    install_requires=["djangorestframework-csv", "drf-flex-fields"],
 )

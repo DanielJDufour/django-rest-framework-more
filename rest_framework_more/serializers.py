@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer
+from rest_flex_fields import FlexFieldsModelSerializer
 
 
 def create_model_serializer_class(
@@ -17,7 +17,7 @@ def create_model_serializer_class(
         "__module__": __name__,
     }
 
-    result = type(serializer_name, (ModelSerializer,), defs)
+    result = type(serializer_name, (FlexFieldsModelSerializer,), defs)
     if debug:
         print("result:", result)
 
