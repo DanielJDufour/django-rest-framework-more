@@ -19,7 +19,7 @@ setup(
             "viewsets.py",
         ]
     },
-    version="0.6.0",
+    version="0.7.0",
     description="More Cool Django Rest Framework Stuff",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -34,10 +34,17 @@ setup(
         "drf",
         "drf-flex-fields",
         "djangorestframework-csv",
+        "excel",
+        "pagination",
+        "xlsx",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    install_requires=["djangorestframework-csv", "drf-flex-fields"],
+    install_requires=[
+        "djangorestframework-csv",
+        "drf-flex-fields",
+        "drf-renderer-xlsx",
+    ],
 )
