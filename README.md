@@ -6,14 +6,15 @@ More Cool Django Rest Framework Stuff
 
 # features
 #### NonPaginatedCSVRenderer
-In case you want a CSV renderer that doesn't respect pagination:
+In case you want a CSV or XLSX (Excel) renderer that doesn't respect pagination:
 ```python
 # in settings.py
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
-        'rest_framework_more.renderers.NonPaginatedCSVRenderer'
+        'rest_framework_more.renderers.NonPaginatedCSVRenderer',
+        'rest_framework_more.renderers.NonPaginatedXLSXRenderer'
     ]
 }
 ```
