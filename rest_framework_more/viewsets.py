@@ -4,10 +4,12 @@ from rest_framework.renderers import BrowsableAPIRenderer
 from rest_framework.renderers import JSONRenderer
 from rest_framework_csv.renderers import PaginatedCSVRenderer
 from rest_framework.viewsets import ReadOnlyModelViewSet
+from drf_renderer_xlsx.renderers import XLSXRenderer
 
 
 from .filters import create_model_filterset_class
-from .renderers import NonPaginatedCSVRenderer
+from .mixins import FileNameMixin
+from .renderers import NonPaginatedCSVRenderer, NonPaginatedXLSXRenderer
 from .serializers import create_model_serializer_class
 
 
@@ -22,6 +24,8 @@ def create_model_viewset_class(
         JSONRenderer,
         PaginatedCSVRenderer,
         NonPaginatedCSVRenderer,
+        XLSXRenderer,
+        NonPaginatedXLSXRenderer,
     ),
 ):
     if not model:
@@ -64,7 +68,7 @@ def create_model_viewset_class(
         "ordering_fields": "__all__",
     }
 
-    viewset = type(viewset_name, (ReadOnlyModelViewSet,), defs)
+    viewset = type(viewset_name, (FileNameMixin, ReadOnlyModelViewSet,), defs)
     if debug:
         print("viewset:", viewset)
 

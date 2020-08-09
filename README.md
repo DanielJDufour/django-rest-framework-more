@@ -5,7 +5,7 @@ More Cool Django Rest Framework Stuff
 `pip3 install djangorestframework-more` or `pipenv install djangorestframework-more`
 
 # features
-#### NonPaginatedCSVRenderer
+#### NonPaginatedCSVRenderer and NonPaginatedXLSXRenderer
 In case you want a CSV or XLSX (Excel) renderer that doesn't respect pagination:
 ```python
 # in settings.py
@@ -54,6 +54,19 @@ from app.models import Car
 from rest_framework_more.viewsets import create_model_viewset_class
 
 CarViewSet = create_model_viewset_class(model=Car)
+```
+
+#### FileNameMixin
+The FileNameMixin automatically generates a more descriptive filename for CSV and Excel exports than the default "download".
+It first tries to convert the url path into a filename.  If that doesn't succeed it tries to pull the filename from the queryset's model.
+```python
+# views.py
+from rest_framework_more.mixins import FileNameMixin
+
+class CarViewSet(FileNameMixin, ReadOnlyModelViewSet):
+...    
+
+# if the CarViewSet is called from the url /api/cars it will generate a download filename of api_cars.csv
 ```
 
 # contact
