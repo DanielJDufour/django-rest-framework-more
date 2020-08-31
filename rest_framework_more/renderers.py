@@ -21,6 +21,9 @@ class NonPaginatedCSVRenderer(CSVRenderer):
         # ignore the page parameter
         query_params.pop("page", None)
 
+        # ignore the fields parameter
+        query_params.pop("fields", None)
+
         # filter out keys with empty strings
         filters = {k: v for k, v in query_params.items() if v != ""}
 
@@ -28,7 +31,7 @@ class NonPaginatedCSVRenderer(CSVRenderer):
 
         serializer = view.serializer_class
 
-        data = serializer(queryset, many=True).data
+        data = serializer(queryset, context={"request": request}, many=True).data
 
         return super(NonPaginatedCSVRenderer, self).render(
             data, accepted_media_type, renderer_context
@@ -54,6 +57,9 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
         # ignore the page parameter
         query_params.pop("page", None)
 
+        # ignore the fields parameter
+        fields = query_params.pop("fields", None)
+
         # filter out keys with empty strings
         filters = {k: v for k, v in query_params.items() if v != ""}
 
@@ -61,7 +67,15 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
 
         serializer = view.serializer_class
 
-        data = serializer(queryset, many=True).data
+        data = serializer(queryset, context={"request": request}, many=True).data
+
+        if fields:
+            column_titles = fields.split(",")
+            if hasattr(view, "column_header"):
+                if "titles" not in view.column_header:
+                    view.column_header["titles"] = column_titles
+            else:
+                view.column_header = {"titles": column_titles}
 
         return super(NonPaginatedXLSXRenderer, self).render(
             data, accepted_media_type, renderer_context

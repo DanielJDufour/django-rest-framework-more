@@ -14,12 +14,13 @@ setup(
         "rest_framework_more": [
             "__init__.py",
             "filters.py",
+            "mixins.py",
             "renderers.py",
             "serializers.py",
             "viewsets.py",
         ]
     },
-    version="0.8.0",
+    version="0.9.0",
     description="More Cool Django Rest Framework Stuff",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -41,9 +42,5 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    install_requires=[
-        "djangorestframework-csv",
-        "drf-renderer-xlsx",
-        "prune"
-    ],
+    install_requires=["djangorestframework-csv", "drf-renderer-xlsx", "prune"],
 )

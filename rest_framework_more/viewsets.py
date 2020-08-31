@@ -68,7 +68,14 @@ def create_model_viewset_class(
         "ordering_fields": "__all__",
     }
 
-    viewset = type(viewset_name, (FileNameMixin, ReadOnlyModelViewSet,), defs)
+    viewset = type(
+        viewset_name,
+        (
+            FileNameMixin,
+            ReadOnlyModelViewSet,
+        ),
+        defs,
+    )
     if debug:
         print("viewset:", viewset)
 
