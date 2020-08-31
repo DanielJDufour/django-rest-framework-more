@@ -10,8 +10,8 @@ django-extensions = "*"
 django-filter = "*"
 djangorestframework-csv = "*"
 drf-renderer-xlsx = "*"
-drf-flex-fields = "*"
 black = "*"
+prune = "*"
 
 [requires]
 python_version = "3.7"

@@ -2,5 +2,5 @@ black
 django-extensions
 django-filter
 djangorestframework-csv
-drf-flex-fields
 drf-renderer-xlsx
+prune

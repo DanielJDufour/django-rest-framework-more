@@ -32,7 +32,6 @@ setup(
         "django",
         "django-rest-framework",
         "drf",
-        "drf-flex-fields",
         "djangorestframework-csv",
         "excel",
         "pagination",
@@ -44,7 +43,7 @@ setup(
     ],
     install_requires=[
         "djangorestframework-csv",
-        "drf-flex-fields",
         "drf-renderer-xlsx",
+        "prune"
     ],
 )
