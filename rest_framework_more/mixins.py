@@ -1,18 +1,7 @@
 from rest_framework.response import Response
 from prune import prune
+from .get_field_keys import get_field_keys
 from .subpaths import subpaths
-
-
-def get_field_keys(fields, path):
-    previous = path + "." if path else ""
-    results = []
-    for field_name, field in fields.items():
-        if field.__class__.__name__ == "NestedSerializer":
-            for result in get_field_keys(field.fields, previous + field_name):
-                results.append(result)
-        else:
-            results.append(previous + field_name)
-    return results
 
 
 class FileNameMixin(object):

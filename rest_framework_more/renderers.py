@@ -1,5 +1,6 @@
 from rest_framework_csv.renderers import CSVRenderer
 from drf_renderer_xlsx.renderers import XLSXRenderer
+from .get_field_keys import get_field_keys
 
 
 class NonPaginatedCSVRenderer(CSVRenderer):
@@ -70,7 +71,14 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
         data = serializer(queryset, context={"request": request}, many=True).data
 
         if fields:
-            column_titles = fields.split(",")
+            fields = fields.split(",")
+
+            keys = get_field_keys(data[0], path="")
+
+            # sort column titles to match how
+            # XLSXRenderer will return the data
+            column_titles = sorted(fields, key=lambda field: keys.index(field))
+
             if hasattr(view, "column_header"):
                 if "titles" not in view.column_header:
                     view.column_header["titles"] = column_titles
