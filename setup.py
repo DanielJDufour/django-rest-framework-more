@@ -20,7 +20,7 @@ setup(
             "viewsets.py",
         ]
     },
-    version="0.12.0",
+    version="0.13.0",
     description="More Cool Django Rest Framework Stuff",
     long_description=long_description,
     long_description_content_type="text/markdown",

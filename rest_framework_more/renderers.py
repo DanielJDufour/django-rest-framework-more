@@ -47,10 +47,11 @@ def get(data, path):
     try:
         original_data = data
         for part in path.split("."):
-            if data:
-                data = data[part]
-                if data is None:
-                    return None
+            if data is None or part not in data:
+                return None
+            data = data[part]
+            if data is None:
+                return None
         return data
     except Exception as e:
         print("original_data:", original_data)
