@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from rest_framework_csv.renderers import CSVRenderer
 from drf_renderer_xlsx.renderers import XLSXRenderer
 from .get_field_keys import get_field_keys
@@ -39,6 +40,15 @@ class NonPaginatedCSVRenderer(CSVRenderer):
         )
 
 
+def get(data, path):
+    for part in path.split("."):
+        if data:
+            data = data[part]
+            if data is None:
+                return None
+    return data
+
+
 class NonPaginatedXLSXRenderer(XLSXRenderer):
     format = "xlsx (non-paginated)"
 
@@ -70,21 +80,45 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
 
         data = serializer(queryset, context={"request": request}, many=True).data
 
+        keys = []
+        for row in data:
+            previous = None
+            for key in get_field_keys(row):
+                if key not in keys:
+                    if previous:
+                        index = keys.index(previous) + 1
+                        keys = keys[:index] + [key] + keys[index:]
+                    else:
+                        keys.append(key)
+                previous = key
+
+        # remove any null foreign keys
+        keys = [
+            key
+            for key in keys
+            if not any([other_key.startswith(key + ".") for other_key in keys])
+        ]
+
+        # reformat the input data
+        flat_data = []
+        for row in data:
+            flat_data.append(OrderedDict([(key, get(row, key)) for key in keys]))
+
         if fields:
             fields = fields.split(",")
-
-            keys = get_field_keys(data[0], path="")
 
             # sort column titles to match how
             # XLSXRenderer will return the data
             column_titles = sorted(fields, key=lambda field: keys.index(field))
+        else:
+            column_titles = keys
 
-            if hasattr(view, "column_header"):
-                if "titles" not in view.column_header:
-                    view.column_header["titles"] = column_titles
-            else:
-                view.column_header = {"titles": column_titles}
+        if hasattr(view, "column_header"):
+            if "titles" not in view.column_header:
+                view.column_header["titles"] = column_titles
+        else:
+            view.column_header = {"titles": column_titles}
 
         return super(NonPaginatedXLSXRenderer, self).render(
-            data, accepted_media_type, renderer_context
+            flat_data, accepted_media_type, renderer_context
         )
