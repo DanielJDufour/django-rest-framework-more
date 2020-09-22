@@ -1,7 +1,10 @@
+from collections import Counter
 from collections import OrderedDict
 from rest_framework_csv.renderers import CSVRenderer
 from drf_renderer_xlsx.renderers import XLSXRenderer
 from .get_field_keys import get_field_keys
+
+DEBUG = False
 
 
 class NonPaginatedCSVRenderer(CSVRenderer):
@@ -41,12 +44,18 @@ class NonPaginatedCSVRenderer(CSVRenderer):
 
 
 def get(data, path):
-    for part in path.split("."):
-        if data:
-            data = data[part]
-            if data is None:
-                return None
-    return data
+    try:
+        original_data = data
+        for part in path.split("."):
+            if data:
+                data = data[part]
+                if data is None:
+                    return None
+        return data
+    except Exception as e:
+        print("original_data:", original_data)
+        print("path:", path)
+        raise e
 
 
 class NonPaginatedXLSXRenderer(XLSXRenderer):
@@ -79,6 +88,8 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
         serializer = view.serializer_class
 
         data = serializer(queryset, context={"request": request}, many=True).data
+        if DEBUG:
+            print("pre-cleaning len(data)", len(data))
 
         keys = []
         for row in data:
@@ -99,10 +110,25 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
             if not any([other_key.startswith(key + ".") for other_key in keys])
         ]
 
+        if DEBUG:
+            print("keys:", keys)
+            print("len(keys):", len(keys))
+
         # reformat the input data
         flat_data = []
         for row in data:
-            flat_data.append(OrderedDict([(key, get(row, key)) for key in keys]))
+            flat_row = []
+            for key in keys:
+                value = get(row, key)
+                # don't want empty dicts because that throws off XLSXRenderer
+                if isinstance(value, dict) and len(value) == 0:
+                    value = None
+                flat_row.append((key, value))
+            flat_data.append(OrderedDict(flat_row))
+
+        if DEBUG:
+            print("post-flattening flat_data[0]", flat_data[0])
+            print("post-flattening len(flat_data)", len(flat_data))
 
         if fields:
             fields = fields.split(",")
@@ -112,6 +138,9 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
             column_titles = sorted(fields, key=lambda field: keys.index(field))
         else:
             column_titles = keys
+
+        if DEBUG:
+            print("column_titles:", column_titles)
 
         if hasattr(view, "column_header"):
             if "titles" not in view.column_header:
