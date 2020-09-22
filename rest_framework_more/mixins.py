@@ -51,7 +51,12 @@ class FieldsMixin(object):
                         if subpath in remove_these_fields:
                             break
 
-                        if not any([f.startswith(subpath) for f in fields_to_keep]):
+                        if not any(
+                            [
+                                f == subpath or f.startswith(subpath + ".")
+                                for f in fields_to_keep
+                            ]
+                        ):
                             remove_these_fields.append(subpath)
                             break
 
