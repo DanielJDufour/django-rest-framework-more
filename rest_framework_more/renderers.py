@@ -19,7 +19,7 @@ class NonPaginatedCSVRenderer(CSVRenderer):
         view = renderer_context["view"]
         request = renderer_context["request"]
 
-        queryset = view.queryset
+        queryset = view.queryset or view.get_queryset()
         query_params = request.query_params.dict()
         query_params.pop("format", None)
 
@@ -71,7 +71,7 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
         view = renderer_context["view"]
         request = renderer_context["request"]
 
-        queryset = view.queryset
+        queryset = view.queryset or view.get_queryset()
         query_params = request.query_params.dict()
         query_params.pop("format", None)
 

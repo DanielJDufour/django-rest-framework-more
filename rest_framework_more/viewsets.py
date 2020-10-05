@@ -16,7 +16,9 @@ from .serializers import create_model_serializer_class
 def create_model_viewset_class(
     model,
     serializer=None,
+    filter_backends=(DjangoFilterBackend, SearchFilter, OrderingFilter),
     filterset_class=None,
+    get_queryset=None,
     queryset=None,
     debug=False,
     renderer_classes=(
@@ -41,7 +43,7 @@ def create_model_viewset_class(
     if model and not serializer:
         serializer = create_model_serializer_class(model=model)
 
-    if not queryset:
+    if not get_queryset and not queryset:
         queryset = model.objects.all()
 
     fields = model._meta.get_fields(include_hidden=True)
@@ -60,13 +62,17 @@ def create_model_viewset_class(
 
     defs = {
         "renderer_classes": renderer_classes,
-        "queryset": queryset,
         "serializer_class": serializer,
-        "filter_backends": [DjangoFilterBackend, SearchFilter, OrderingFilter],
+        "filter_backends": filter_backends,
         "filterset_class": filterset_class,
         "search_fields": text_fields,
         "ordering_fields": "__all__",
     }
+    if get_queryset:
+        defs["basename"] = model_name.lower()
+        defs["get_queryset"] = get_queryset
+    elif queryset:
+        defs["queryset"] = queryset
 
     viewset = type(
         viewset_name,
