@@ -2,10 +2,10 @@ from collections import Counter
 from collections import OrderedDict
 from rest_framework_csv.renderers import CSVRenderer
 from drf_renderer_xlsx.renderers import XLSXRenderer
+import simple_env as se
 from .get_field_keys import get_field_keys
 
-DEBUG = False
-
+DEBUG = se.get("DEBUG_DRF_MORE") or False
 
 class NonPaginatedCSVRenderer(CSVRenderer):
     format = "csv (non-paginated)"
@@ -129,6 +129,7 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
 
         if DEBUG:
             print("post-flattening flat_data[0]", flat_data[0])
+            print("post-flattening flat_data[1]", flat_data[1])
             print("post-flattening len(flat_data)", len(flat_data))
 
         if fields:

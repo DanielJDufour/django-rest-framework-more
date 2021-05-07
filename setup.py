@@ -42,5 +42,5 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    install_requires=["djangorestframework-csv", "drf-renderer-xlsx", "prune"],
+    install_requires=["djangorestframework-csv", "drf-renderer-xlsx", "prune", "simple-env"],
 )

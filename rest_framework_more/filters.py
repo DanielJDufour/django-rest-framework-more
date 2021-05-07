@@ -1,31 +1,30 @@
 from django.forms import ModelForm
 from django_filters.rest_framework import FilterSet
 
-
-def create_model_filter_form(model, debug=False):
+def create_model_filter_form(model, debug=False, form_field_class_names=("BooleanField", "CharField", "DateField", "DateTimeField", "DecimalField", "TextField")):
 
     model_name = model.__name__
     if debug:
         print("model_name:", model_name)
 
-    filterable_fields = model._meta.get_fields(include_hidden=False)
+    visible_fields = model._meta.get_fields(include_hidden=False)
     if debug:
-        print("filterable_fields:", filterable_fields)
+        print("visible_fields:", visible_fields)
 
-    filterable_field_names = [
+    form_field_names = [
         f.name
-        for f in filterable_fields
-        if f.__class__.__name__ in ("BooleanField", "CharField", "TextField")
+        for f in visible_fields
+        if f.editable and f.__class__.__name__ in form_field_class_names
     ]
     if debug:
-        print("filterable_field_names:", filterable_field_names)
+        print("form_field_names:", form_field_names)
 
     form_name = model_name + "Form"
     if debug:
         print("form_name:", form_name)
 
     form_defs = {
-        "Meta": type("Meta", (), {"fields": filterable_field_names, "model": model})
+        "Meta": type("Meta", (), {"fields": form_field_names, "model": model})
     }
 
     form = type(form_name, (ModelForm,), form_defs)
@@ -35,7 +34,7 @@ def create_model_filter_form(model, debug=False):
     return form
 
 
-def create_model_filterset_class(model=None, form=None, debug=False):
+def create_model_filterset_class(model=None, form=None, debug=False, valid_lookups=None):
 
     if form is None and model is None:
         raise Exception("you must pass in a form or model")
@@ -55,7 +54,29 @@ def create_model_filterset_class(model=None, form=None, debug=False):
     if debug:
         print("filter_name:", filter_name)
 
-    fields = form.Meta.fields
+    visible_fields = model._meta.get_fields(include_hidden=False)
+    if debug:
+        print("visible_fields:", visible_fields)
+
+    fields = {}
+    for field in model._meta.get_fields(include_hidden=False):
+        lookups = list(field.__class__.get_lookups().keys())
+
+        if debug:
+            print("lookups:", lookups)
+        if 'date' in lookups:
+            for extra_lookup in ['date__gt', 'date__gte', 'date__lt', 'date__lte', 'date__range']:
+                if extra_lookup not in lookups:
+                    lookups.append(extra_lookup)
+
+        if valid_lookups:
+            lookups = [lookup for lookup in lookups if lookup in valid_lookups]
+
+        if debug:
+            print("filtered lookups:", lookups)
+        if lookups:
+            fields[field.name] = lookups
+
     if debug:
         print("fields:", fields)
 

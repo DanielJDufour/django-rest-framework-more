@@ -29,6 +29,7 @@ def create_model_viewset_class(
         XLSXRenderer,
         NonPaginatedXLSXRenderer,
     ),
+    valid_lookups=None
 ):
     if not model:
         raise Exception("You must pass in a model")
@@ -38,7 +39,7 @@ def create_model_viewset_class(
         print("model_name:", model_name)
 
     if model and not filterset_class:
-        filterset_class = create_model_filterset_class(model=model)
+        filterset_class = create_model_filterset_class(model=model, valid_lookups=valid_lookups)
 
     if model and not serializer:
         serializer = create_model_serializer_class(model=model)
@@ -71,7 +72,9 @@ def create_model_viewset_class(
     if get_queryset:
         defs["basename"] = model_name.lower()
         defs["get_queryset"] = get_queryset
-    elif queryset:
+
+    # we have to add "is not None" or the queryset is evaluated
+    elif queryset is not None:
         defs["queryset"] = queryset
 
     viewset = type(
