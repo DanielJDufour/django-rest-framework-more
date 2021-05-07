@@ -1,7 +1,19 @@
 from django.forms import ModelForm
 from django_filters.rest_framework import FilterSet
 
-def create_model_filter_form(model, debug=False, form_field_class_names=("BooleanField", "CharField", "DateField", "DateTimeField", "DecimalField", "TextField")):
+
+def create_model_filter_form(
+    model,
+    debug=False,
+    form_field_class_names=(
+        "BooleanField",
+        "CharField",
+        "DateField",
+        "DateTimeField",
+        "DecimalField",
+        "TextField",
+    ),
+):
 
     model_name = model.__name__
     if debug:
@@ -23,9 +35,7 @@ def create_model_filter_form(model, debug=False, form_field_class_names=("Boolea
     if debug:
         print("form_name:", form_name)
 
-    form_defs = {
-        "Meta": type("Meta", (), {"fields": form_field_names, "model": model})
-    }
+    form_defs = {"Meta": type("Meta", (), {"fields": form_field_names, "model": model})}
 
     form = type(form_name, (ModelForm,), form_defs)
     if debug:
@@ -34,7 +44,9 @@ def create_model_filter_form(model, debug=False, form_field_class_names=("Boolea
     return form
 
 
-def create_model_filterset_class(model=None, form=None, debug=False, valid_lookups=None):
+def create_model_filterset_class(
+    model=None, form=None, debug=False, valid_lookups=None
+):
 
     if form is None and model is None:
         raise Exception("you must pass in a form or model")
@@ -64,8 +76,14 @@ def create_model_filterset_class(model=None, form=None, debug=False, valid_looku
 
         if debug:
             print("lookups:", lookups)
-        if 'date' in lookups:
-            for extra_lookup in ['date__gt', 'date__gte', 'date__lt', 'date__lte', 'date__range']:
+        if "date" in lookups:
+            for extra_lookup in [
+                "date__gt",
+                "date__gte",
+                "date__lt",
+                "date__lte",
+                "date__range",
+            ]:
                 if extra_lookup not in lookups:
                     lookups.append(extra_lookup)
 
