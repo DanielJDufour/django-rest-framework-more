@@ -1,3 +1,5 @@
+:warning: **Warning** NonPaginatedXLSXRenderer does not work with newer versions of [drf-renderer-xlsx](https://pypi.org/project/drf-renderer-xlsx/).  Please set your version of drf-renderer-xlsx to 0.3.8.
+
 # django-rest-framework-more
 More Cool Django Rest Framework Stuff
 
