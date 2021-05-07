@@ -72,28 +72,48 @@ def create_model_filterset_class(
 
     fields = {}
     for field in model._meta.get_fields(include_hidden=False):
-        lookups = list(field.__class__.get_lookups().keys())
+        clazz = field.__class__
+        # ManyToOneRel doesn't have get_lookups
+        if hasattr(clazz, "get_lookups"):
+            lookups = list(clazz.get_lookups().keys())
 
-        if debug:
-            print("lookups:", lookups)
-        if "date" in lookups:
-            for extra_lookup in [
-                "date__gt",
-                "date__gte",
-                "date__lt",
-                "date__lte",
-                "date__range",
-            ]:
-                if extra_lookup not in lookups:
-                    lookups.append(extra_lookup)
+            # contains doesn't make sense for some fields
+            if clazz.__name__ in (
+                "AutoField",
+                "BooleanField",
+                "DateField",
+                "DateTimeField",
+                "DecimalField",
+                "IntegerField",
+                "NullBooleanField",
+            ):
+                lookups = [
+                    lookup
+                    for lookup in lookups
+                    if lookup not in ("contains", "icontains")
+                ]
 
-        if valid_lookups:
-            lookups = [lookup for lookup in lookups if lookup in valid_lookups]
+            if debug:
+                print("lookups:", lookups)
+            if "date" in lookups:
+                for extra_lookup in [
+                    "date__gt",
+                    "date__gte",
+                    "date__lt",
+                    "date__lte",
+                    "date__range",
+                ]:
+                    if extra_lookup not in lookups:
+                        lookups.append(extra_lookup)
 
-        if debug:
-            print("filtered lookups:", lookups)
-        if lookups:
-            fields[field.name] = lookups
+            if valid_lookups:
+                lookups = [lookup for lookup in lookups if lookup in valid_lookups]
+
+            if debug:
+                print("filtered lookups:", lookups)
+
+            if lookups:
+                fields[field.name] = lookups
 
     if debug:
         print("fields:", fields)

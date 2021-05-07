@@ -85,7 +85,32 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
         # filter out keys with empty strings
         filters = {k: v for k, v in query_params.items() if v != ""}
 
+        model = queryset[0].__class__
+
+        model_fields = model._meta.get_fields(include_hidden=False)
+
+        model_name = model.__name__
+
+        fields_to_clean = [
+            field.name
+            for field in model_fields
+            if "Boolean" in field.__class__.__name__
+            or "Integer" in field.__class__.__name__
+        ]
+        if DEBUG:
+            print("fields_to_clean:", fields_to_clean)
+
+        # clean filter input
+        filters = {
+            k: (se.clean(v) if k in fields_to_clean else v) for k, v in filters.items()
+        }
+
+        if DEBUG:
+            print("filters (after cleaning):", filters)
+
         queryset = queryset.filter(**filters)
+        if DEBUG:
+            print("queryset (after filtering):", queryset)
 
         serializer = view.serializer_class
 
