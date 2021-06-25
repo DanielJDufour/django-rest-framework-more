@@ -7,6 +7,11 @@ from .get_field_keys import get_field_keys
 
 DEBUG = se.get("DEBUG_DRF_MORE") or False
 
+try:
+    from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
+except Exception as e:
+    ILLEGAL_CHARACTERS_RE = None
+
 
 class NonPaginatedCSVRenderer(CSVRenderer):
     format = "csv (non-paginated)"
@@ -150,6 +155,8 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
                 # don't want empty dicts because that throws off XLSXRenderer
                 if isinstance(value, dict) and len(value) == 0:
                     value = None
+                elif isinstance(value, str):
+                    value = ILLEGAL_CHARACTERS_RE.sub("", value)
                 flat_row.append((key, value))
             flat_data.append(OrderedDict(flat_row))
 

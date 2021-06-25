@@ -9,9 +9,11 @@ verify_ssl = true
 django-extensions = "*"
 django-filter = "*"
 djangorestframework-csv = "*"
-drf-renderer-xlsx = "*"
+drf-renderer-xlsx = "==0.3.8"
 black = "*"
 prune = "*"
+djangorestframework-more = {editable = true, path = "."}
+simple-env = "*"
 
 [pipenv]
 allow_prereleases = true
