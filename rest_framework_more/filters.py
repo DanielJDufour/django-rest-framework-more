@@ -73,9 +73,17 @@ def create_model_filterset_class(
     fields = {}
     for field in model._meta.get_fields(include_hidden=False):
         clazz = field.__class__
+
         # ManyToOneRel doesn't have get_lookups
         if hasattr(clazz, "get_lookups"):
             lookups = list(clazz.get_lookups().keys())
+
+            # django-filter doesn't work with some field classes
+            if clazz.__name__ in (
+                "ImageField",
+                "JSONField",
+            ):
+                continue
 
             # contains doesn't make sense for some fields
             if clazz.__name__ in (
