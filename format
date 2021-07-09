@@ -1,4 +1,3 @@
 #!/bin/sh -e
 
-pipenv run black rest_framework_more setup.py
-
+pipenv run shed rest_framework_more/*.py setup.py

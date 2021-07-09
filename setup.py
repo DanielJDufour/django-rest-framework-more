@@ -1,5 +1,6 @@
-from setuptools import setup
 from os import path
+
+from setuptools import setup
 
 this_directory = path.abspath(path.dirname(__file__))
 
@@ -20,7 +21,7 @@ setup(
             "viewsets.py",
         ]
     },
-    version="0.17.1",
+    version="1.0.0",
     description="More Cool Django Rest Framework Stuff",
     long_description=long_description,
     long_description_content_type="text/markdown",

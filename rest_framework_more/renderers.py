@@ -1,15 +1,18 @@
-from collections import Counter
 from collections import OrderedDict
-from rest_framework_csv.renderers import CSVRenderer
-from drf_renderer_xlsx.renderers import XLSXRenderer
+
 import simple_env as se
+from drf_renderer_xlsx.renderers import XLSXRenderer
+from rest_framework_csv.renderers import CSVRenderer
+
 from .get_field_keys import get_field_keys
 
 DEBUG = se.get("DEBUG_DRF_MORE") or False
 
+PREFETCH_MAX = se.get("DRF_PREFETCH_MAX") or 100
+
 try:
     from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
-except Exception as e:
+except Exception:
     ILLEGAL_CHARACTERS_RE = None
 
 
@@ -44,9 +47,7 @@ class NonPaginatedCSVRenderer(CSVRenderer):
 
         data = serializer(queryset, context={"request": request}, many=True).data
 
-        return super(NonPaginatedCSVRenderer, self).render(
-            data, accepted_media_type, renderer_context
-        )
+        return super().render(data, accepted_media_type, renderer_context)
 
 
 def get(data, path):
@@ -63,6 +64,41 @@ def get(data, path):
         print("original_data:", original_data)
         print("path:", path)
         raise e
+
+
+# cleans a path, so it resolves to a model and not a field
+def get_model_path(model, path):
+    model_path = []
+
+    for field_name in path:
+        field = model._meta.get_field(field_name)
+        if field.__class__.__name__ == "ForeignKey":
+            model_path.append(field_name)
+            model = field.related_model
+        else:
+            break
+
+    return model_path
+
+
+def get_model_by_path(model, path):
+    if isinstance(path, str):
+        if "." in path:
+            path = path.split(".")
+        elif "__" in path:
+            path = path.split("__")
+        else:
+            path = [path]
+
+    for field_name in path[:-1]:
+        model = model._meta.get_field(field_name).related_model
+
+    # check if last part of path is a foreign key or not
+    last_field = model._meta.get_field(path[-1])
+    if last_field.__class__.__name__ == "ForeignKey":
+        model = last_field.related_model
+
+    return model
 
 
 class NonPaginatedXLSXRenderer(XLSXRenderer):
@@ -94,7 +130,13 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
 
         model_fields = model._meta.get_fields(include_hidden=False)
 
-        model_name = model.__name__
+        model.__name__
+
+        # get paths to model fields and related fields
+        # by traversing the model classes without db queries
+        model_field_paths = get_field_keys(model)
+        if DEBUG:
+            print("[django-rest-framework-more] model_field_paths:", model_field_paths)
 
         fields_to_clean = [
             field.name
@@ -112,6 +154,32 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
 
         if DEBUG:
             print("filters (after cleaning):", filters)
+
+        related_paths = [
+            path
+            for path in (filters.keys() if filters else model_field_paths)
+            if "." in path
+        ]
+        if DEBUG:
+            print("[django-rest-framework-more] related_path_lookups:", related_paths)
+
+        # convert paths to fields to paths to models
+        related_model_paths = list(
+            {
+                "__".join(get_model_path(model, path.split(".")))
+                for path in related_paths
+            }
+        )
+        if DEBUG:
+            print(
+                "[django-rest-framework-more] related_model_paths:", related_model_paths
+            )
+
+        for path in related_model_paths:
+            if get_model_by_path(model, path).objects.count() <= PREFETCH_MAX:
+                if DEBUG:
+                    print("[django-rest-framework-more] prefetching:" + path)
+                queryset = queryset.prefetch_related(path)
 
         queryset = queryset.filter(**filters)
         if DEBUG:
@@ -162,7 +230,8 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
 
         if DEBUG:
             print("post-flattening flat_data[0]", flat_data[0])
-            print("post-flattening flat_data[1]", flat_data[1])
+            if len(flat_data) > 1:
+                print("post-flattening flat_data[1]", flat_data[1])
             print("post-flattening len(flat_data)", len(flat_data))
 
         if fields:
@@ -183,6 +252,4 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
         else:
             view.column_header = {"titles": column_titles}
 
-        return super(NonPaginatedXLSXRenderer, self).render(
-            flat_data, accepted_media_type, renderer_context
-        )
+        return super().render(flat_data, accepted_media_type, renderer_context)

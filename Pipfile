@@ -14,6 +14,7 @@ black = "*"
 prune = "*"
 djangorestframework-more = {editable = true, path = "."}
 simple-env = "*"
+shed = "*"
 
 [pipenv]
 allow_prereleases = true

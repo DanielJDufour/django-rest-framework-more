@@ -1,10 +1,11 @@
-from rest_framework.response import Response
 from prune import prune
+from rest_framework.response import Response
+
 from .get_field_keys import get_field_keys
 from .subpaths import subpaths
 
 
-class FileNameMixin(object):
+class FileNameMixin:
     def get_filename(self, request, response):
         try:
             return request.path_info.replace("/", "_").strip("_")
@@ -17,9 +18,7 @@ class FileNameMixin(object):
             return "download"
 
     def finalize_response(self, request, response, *args, **kwargs):
-        response = super(FileNameMixin, self).finalize_response(
-            request, response, *args, **kwargs
-        )
+        response = super().finalize_response(request, response, *args, **kwargs)
         if isinstance(response, Response):
             if "xlsx" in response.accepted_renderer.format:
                 filename = self.get_filename(request, response) + ".xlsx"
@@ -34,9 +33,9 @@ class FileNameMixin(object):
         return response
 
 
-class FieldsMixin(object):
+class FieldsMixin:
     def to_representation(self, *args, **kwargs):
-        ret = super(FieldsMixin, self).to_representation(*args, **kwargs)
+        ret = super().to_representation(*args, **kwargs)
 
         try:
             fields = self.context["request"].query_params.get("fields")
