@@ -176,10 +176,16 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
             )
 
         for path in related_model_paths:
-            if get_model_by_path(model, path).objects.count() <= PREFETCH_MAX:
-                if DEBUG:
-                    print("[django-rest-framework-more] prefetching:" + path)
-                queryset = queryset.prefetch_related(path)
+            try:
+                if (
+                    get_model_by_path(model, path).objects.using(queryset.db).count()
+                    <= PREFETCH_MAX
+                ):
+                    if DEBUG:
+                        print("[django-rest-framework-more] prefetching:" + path)
+                    queryset = queryset.prefetch_related(path)
+            except Exception as e:
+                print(e)
 
         queryset = queryset.filter(**filters)
         if DEBUG:
