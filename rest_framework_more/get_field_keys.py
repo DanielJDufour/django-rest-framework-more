@@ -11,17 +11,22 @@ def get_field_keys(fields, path=""):
                 (field.name, field)
                 for field in fields._meta.get_fields()
                 # don't want to go backwards
-                if field.__class__.__name__ != "ManyToOneRel"
+                if (field.__class__.__name__ != "ManyToOneRel") and
+                # avoid recursive self references
+                not (
+                    field.__class__.__name__ == "ForeignKey"
+                    and field.related_model == fields
+                )
             ]
         )
 
     for field_name, field in fields.items():
-        if (
-            field.__class__.__name__ == "NestedSerializer"
-            or field.__class__.__name__ == "OrderedDict"
-            or field.__class__.__name__ == "dict"
-            or field.__class__.__name__ == "ForeignKey"
-        ):
+        if field.__class__.__name__ in [
+            "NestedSerializer",
+            "OrderedDict",
+            "dict",
+            "ForeignKey",
+        ]:
             subobj = None
             if hasattr(field, "fields"):
                 subobj = field.fields

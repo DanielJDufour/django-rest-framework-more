@@ -216,6 +216,13 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
             if not any([other_key.startswith(key + ".") for other_key in keys])
         ]
 
+        # filter out recursive lookups
+        keys = [
+            key
+            for key in keys
+            if not any([(k + "." + k) in key for k in key.split(".")])
+        ]
+
         if DEBUG:
             print("keys:", keys)
             print("len(keys):", len(keys))
