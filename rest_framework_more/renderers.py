@@ -66,6 +66,13 @@ def get(data, path):
         raise e
 
 
+def has_consecutive_repeat(data):
+    for i in range(1, len(data)):
+        if data[i - 1] == data[i]:
+            return True
+    return False
+
+
 # cleans a path, so it resolves to a model and not a field
 def get_model_path(model, path):
     model_path = []
@@ -208,6 +215,8 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
                     else:
                         keys.append(key)
                 previous = key
+        if DEBUG:
+            print("# keys after first pass", sorted(keys))
 
         # remove any null foreign keys
         keys = [
@@ -215,13 +224,13 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
             for key in keys
             if not any([other_key.startswith(key + ".") for other_key in keys])
         ]
+        if DEBUG:
+            print("# keys after removing null foreign keys", keys)
 
         # filter out recursive lookups
-        keys = [
-            key
-            for key in keys
-            if not any([(k + "." + k) in key for k in key.split(".")])
-        ]
+        keys = [key for key in keys if not has_consecutive_repeat(key.split("."))]
+        if DEBUG:
+            print("# keys after filtering likely recursive lookups", keys)
 
         if DEBUG:
             print("keys:", keys)
