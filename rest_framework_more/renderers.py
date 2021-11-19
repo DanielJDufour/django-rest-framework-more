@@ -259,10 +259,26 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
 
         if fields:
             fields = fields.split(",")
+            if DEBUG:
+                print("fields:", fields)
+
+            # expand field referring to subpath to valid nested values
+            expanded_fields = []
+            for field in fields:
+                if field in keys:
+                    expanded_fields.append(field)
+                else:
+                    for key in keys:
+                        if key.startswith(field):
+                            if key not in fields:
+                                expanded_fields.append(key)
+
+            if DEBUG:
+                print("expanded_fields:", expanded_fields)
 
             # sort column titles to match how
             # XLSXRenderer will return the data
-            column_titles = sorted(fields, key=lambda field: keys.index(field))
+            column_titles = sorted(expanded_fields, key=lambda field: keys.index(field))
         else:
             column_titles = keys
 
