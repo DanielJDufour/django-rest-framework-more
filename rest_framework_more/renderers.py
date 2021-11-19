@@ -251,7 +251,8 @@ class NonPaginatedXLSXRenderer(XLSXRenderer):
             flat_data.append(OrderedDict(flat_row))
 
         if DEBUG:
-            print("post-flattening flat_data[0]", flat_data[0])
+            if len(flat_data) > 0:
+                print("post-flattening flat_data[0]", flat_data[0])
             if len(flat_data) > 1:
                 print("post-flattening flat_data[1]", flat_data[1])
             print("post-flattening len(flat_data)", len(flat_data))
