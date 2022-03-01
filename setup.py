@@ -21,7 +21,7 @@ setup(
             "viewsets.py",
         ]
     },
-    version="1.4.0",
+    version="1.5.0",
     description="More Cool Django Rest Framework Stuff",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -36,6 +36,9 @@ setup(
         "drf",
         "djangorestframework-csv",
         "excel",
+        "filters",
+        "forms",
+        "models",
         "pagination",
         "xlsx",
     ],
