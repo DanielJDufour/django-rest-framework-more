@@ -75,10 +75,10 @@ def create_model_filterset_class(
     fields = {}
     filter_overrides = {
         ArrayField: {
-            'filter_class': CharFilter,
-            'extra': lambda f: {
-                'lookup_expr': 'icontains',
-            }
+            "filter_class": CharFilter,
+            "extra": lambda f: {
+                "lookup_expr": "icontains",
+            },
         }
     }
     for field in model._meta.get_fields(include_hidden=False):
@@ -113,7 +113,7 @@ def create_model_filterset_class(
 
             # see filter_overrides
             if clazz.__name__ == "ArrayField":
-                lookups = ['icontains']
+                lookups = ["icontains"]
 
             if debug:
                 print("lookups:", lookups)
@@ -141,7 +141,16 @@ def create_model_filterset_class(
         print("fields:", fields)
 
     filter_defs = {
-        "Meta": type("Meta", (), {"fields": fields, "model": model, "form": form, "filter_overrides": filter_overrides })
+        "Meta": type(
+            "Meta",
+            (),
+            {
+                "fields": fields,
+                "model": model,
+                "form": form,
+                "filter_overrides": filter_overrides,
+            },
+        )
     }
     if debug:
         print("filter_defs:", filter_defs)
