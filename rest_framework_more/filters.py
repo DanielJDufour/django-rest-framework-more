@@ -1,4 +1,6 @@
+from django.contrib.postgres.fields import ArrayField
 from django.forms import ModelForm
+from django_filters import CharFilter
 from django_filters.rest_framework import FilterSet
 
 
@@ -71,6 +73,14 @@ def create_model_filterset_class(
         print("visible_fields:", visible_fields)
 
     fields = {}
+    filter_overrides = {
+        ArrayField: {
+            'filter_class': CharFilter,
+            'extra': lambda f: {
+                'lookup_expr': 'icontains',
+            }
+        }
+    }
     for field in model._meta.get_fields(include_hidden=False):
         clazz = field.__class__
 
@@ -101,6 +111,10 @@ def create_model_filterset_class(
                     if lookup not in ("contains", "icontains")
                 ]
 
+            # see filter_overrides
+            if clazz.__name__ == "ArrayField":
+                lookups = ['icontains']
+
             if debug:
                 print("lookups:", lookups)
             if "date" in lookups:
@@ -127,7 +141,7 @@ def create_model_filterset_class(
         print("fields:", fields)
 
     filter_defs = {
-        "Meta": type("Meta", (), {"fields": fields, "model": model, "form": form})
+        "Meta": type("Meta", (), {"fields": fields, "model": model, "form": form, "filter_overrides": filter_overrides })
     }
     if debug:
         print("filter_defs:", filter_defs)

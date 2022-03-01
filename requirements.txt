@@ -4,3 +4,4 @@ django-filter
 djangorestframework-csv
 drf-renderer-xlsx==0.3.8
 prune
+psycopg2

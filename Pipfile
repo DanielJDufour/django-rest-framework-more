@@ -15,6 +15,7 @@ prune = "*"
 djangorestframework-more = {editable = true, path = "."}
 simple-env = "*"
 shed = "*"
+psycopg2 = "*"
 
 [pipenv]
 allow_prereleases = true
