@@ -19,6 +19,7 @@ def create_model_viewset_class(
     get_queryset=None,
     queryset=None,
     debug=False,
+    permission_classes=None,
     renderer_classes=(
         BrowsableAPIRenderer,
         JSONRenderer,
@@ -62,6 +63,7 @@ def create_model_viewset_class(
         print("viewset_name:", viewset_name)
 
     defs = {
+        "permission_classes": permission_classes,
         "renderer_classes": renderer_classes,
         "serializer_class": serializer,
         "filter_backends": filter_backends,
