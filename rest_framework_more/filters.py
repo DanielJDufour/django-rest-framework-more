@@ -90,6 +90,8 @@ def create_model_filterset_class(
 
             # django-filter doesn't work with some field classes
             if clazz.__name__ in (
+                "BinaryField",
+                "FileField",
                 "ImageField",
                 "JSONField",
             ):
